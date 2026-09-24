@@ -1,18 +1,19 @@
 schema_version: 1
 
 context:
-  version: "22.5.0"
+  version: "23.12.0"
 
 package:
   name: aioprometheus
   version: ${{ version }}
 
 source:
-  url: https://github.com/claws/aioprometheus/archive/refs/tags/${{ version }}.tar.gz
-  sha256: 9f90f8f4edfb7092b416faac30b0a234c10bb4246b52b867e41ec64f084a91cc
+  # 23.12.0 has no PyPI sdist or GitHub tag; pin its release commit.
+  url: https://github.com/claws/aioprometheus/archive/2fabe659c3c5259b50ac90c3106df7d41b8a3c74.tar.gz
+  sha256: 7fc508d10aa38a157aba7d2b70a1b996fe400da77463b3cc308174b27b4fb020
 
 build:
-  number: 1
+  number: 0
   noarch: python
   script: ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
 
@@ -20,6 +21,8 @@ requirements:
   host:
     - python ${{ python_min }}.*
     - pip
+    - setuptools
+    - wheel
   run:
     - python >=${{ python_min }}
     - aiohttp
@@ -27,6 +30,18 @@ requirements:
     - quantile-python
 
 tests:
+  # test_pusher requires aiohttp-basicauth, which is unavailable on conda-forge.
+  - script: pytest -vvv tests --ignore=tests/test_pusher.py
+    requirements:
+      run:
+        - python ${{ python_min }}.*
+        - pytest
+        - fastapi
+        - httpx
+        - quart
+    files:
+      source:
+        - tests/
   - python:
       imports:
         - aioprometheus
@@ -50,4 +65,3 @@ about:
 extra:
   recipe-maintainers:
     - mediocretech
-
