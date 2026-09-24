@@ -1,0 +1,53 @@
+schema_version: 1
+
+context:
+  version: "22.5.0"
+
+package:
+  name: aioprometheus
+  version: ${{ version }}
+
+source:
+  url: https://github.com/claws/aioprometheus/archive/refs/tags/${{ version }}.tar.gz
+  sha256: 9f90f8f4edfb7092b416faac30b0a234c10bb4246b52b867e41ec64f084a91cc
+
+build:
+  number: 1
+  noarch: python
+  script: ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+
+requirements:
+  host:
+    - python ${{ python_min }}.*
+    - pip
+  run:
+    - python >=${{ python_min }}
+    - aiohttp
+    - orjson
+    - quantile-python
+
+tests:
+  - python:
+      imports:
+        - aioprometheus
+      pip_check: true
+      python_version:
+        - ${{ python_min }}.*
+        - '*'
+
+about:
+  license: MIT
+  license_file:
+    - License/LICENSE
+  summary: aioprometheus is a Prometheus Python client library for asyncio-based applications.
+  description: |
+    aioprometheus is a Prometheus Python client library for asyncio-based applications.
+    It provides metrics collection and serving capabilities for use with Prometheus and
+    compatible monitoring systems. It supports exporting metrics into text and pushing metrics to a gateway.
+  homepage: https://github.com/claws/aioprometheus
+  documentation: https://aioprometheus.readthedocs.io/en/latest/
+
+extra:
+  recipe-maintainers:
+    - mediocretech
+
